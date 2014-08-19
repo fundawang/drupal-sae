@@ -133,7 +133,7 @@ function file_get_stream_wrappers($filter = STREAM_WRAPPERS_ALL) {
     $existing = stream_get_wrappers();
     foreach ($wrappers as $scheme => $info) {
       // We only register classes that implement our interface.
-      if (in_array('DrupalStreamWrapperInterface', class_implements($info['class']), TRUE)) {
+      if (in_array('DPSAE_DrupalStreamWrapperInterface', class_implements($info['class']), TRUE)) {
         // Record whether we are overriding an existing scheme.
         if (in_array($scheme, $existing, TRUE)) {
           $wrappers[$scheme]['override'] = TRUE;
@@ -475,6 +475,7 @@ function file_ensure_htaccess() {
  *   already present. Defaults to FALSE.
  */
 function file_create_htaccess($directory, $private = TRUE, $force_overwrite = FALSE) {
+  return;
   if (file_uri_scheme($directory)) {
     $directory = file_stream_wrapper_uri_normalize($directory);
   }

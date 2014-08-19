@@ -763,7 +763,7 @@ abstract class DrupalLocalStreamWrapper implements DrupalStreamWrapperInterface 
  * Provides support for storing publicly accessible files with the Drupal file
  * interface.
  */
-class DrupalPublicStreamWrapper extends DrupalLocalStreamWrapper {
+class DrupalPublicStreamWrapper extends DPSAE_StreamWrapper {
   /**
    * Implements abstract public function getDirectoryPath()
    */
@@ -777,6 +777,7 @@ class DrupalPublicStreamWrapper extends DrupalLocalStreamWrapper {
    * Return the HTML URI of a public file.
    */
   function getExternalUrl() {
+    return $this->getStorageUrl();
     $path = str_replace('\\', '/', $this->getTarget());
     return $GLOBALS['base_url'] . '/' . self::getDirectoryPath() . '/' . drupal_encode_path($path);
   }
@@ -789,7 +790,7 @@ class DrupalPublicStreamWrapper extends DrupalLocalStreamWrapper {
  * Provides support for storing privately accessible files with the Drupal file
  * interface.
  */
-class DrupalPrivateStreamWrapper extends DrupalLocalStreamWrapper {
+class DrupalPrivateStreamWrapper extends DPSAE_StreamWrapper {
   /**
    * Implements abstract public function getDirectoryPath()
    */
@@ -803,6 +804,7 @@ class DrupalPrivateStreamWrapper extends DrupalLocalStreamWrapper {
    * Return the HTML URI of a private file.
    */
   function getExternalUrl() {
+    return $this->getStorageUrl();
     $path = str_replace('\\', '/', $this->getTarget());
     return url('system/files/' . $path, array('absolute' => TRUE));
   }
@@ -816,7 +818,7 @@ class DrupalPrivateStreamWrapper extends DrupalLocalStreamWrapper {
  *
  * Extends DrupalPublicStreamWrapper.
  */
-class DrupalTemporaryStreamWrapper extends DrupalLocalStreamWrapper {
+class DrupalTemporaryStreamWrapper extends DPSAE_StreamWrapper {
   /**
    * Implements abstract public function getDirectoryPath()
    */
@@ -828,6 +830,7 @@ class DrupalTemporaryStreamWrapper extends DrupalLocalStreamWrapper {
    * Overrides getExternalUrl().
    */
   public function getExternalUrl() {
+    return $this->getStorageUrl();
     $path = str_replace('\\', '/', $this->getTarget());
     return url('system/temporary/' . $path, array('absolute' => TRUE));
   }

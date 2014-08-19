@@ -1,5 +1,7 @@
 <?php
 
+require_once DRUPAL_ROOT . '/includes/sae.inc';
+
 /**
  * @file
  * Functions that need to be loaded on every Drupal request.
@@ -679,6 +681,7 @@ function drupal_environment_initialize() {
   ini_set('magic_quotes_runtime', '0');
   // Use session cookies, not transparent sessions that puts the session id in
   // the query string.
+  /*
   ini_set('session.use_cookies', '1');
   ini_set('session.use_only_cookies', '1');
   ini_set('session.use_trans_sid', '0');
@@ -687,6 +690,7 @@ function drupal_environment_initialize() {
   ini_set('session.cache_limiter', '');
   // Use httponly session cookies.
   ini_set('session.cookie_httponly', '1');
+   */
 
   // Set sane locale settings, to ensure consistent string, dates, times and
   // numbers handling.
@@ -780,7 +784,9 @@ function drupal_settings_initialize() {
   // Per RFC 2109, cookie domains must contain at least one dot other than the
   // first. For hosts such as 'localhost' or IP Addresses we don't set a cookie domain.
   if (count(explode('.', $cookie_domain)) > 2 && !is_numeric(str_replace('.', '', $cookie_domain))) {
+    /*
     ini_set('session.cookie_domain', $cookie_domain);
+     */
   }
   // To prevent session cookies from being hijacked, a user can configure the
   // SSL version of their website to only transfer session cookies via SSL by

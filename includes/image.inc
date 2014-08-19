@@ -74,7 +74,7 @@ function image_get_toolkit() {
     }
   }
 
-  return $toolkit;
+  return 'saegd';
 }
 
 /**
