@@ -10,7 +10,7 @@ require_once DRUPAL_ROOT . '/includes/sae.inc';
 /**
  * The current system version.
  */
-define('VERSION', '7.32-dev');
+define('VERSION', '7.33-dev');
 
 /**
  * Core API compatibility.
@@ -858,7 +858,7 @@ function drupal_get_filename($type, $name, $filename = NULL) {
     try {
       if (function_exists('db_query')) {
         $file = db_query("SELECT filename FROM {system} WHERE name = :name AND type = :type", array(':name' => $name, ':type' => $type))->fetchField();
-        if (file_exists(DRUPAL_ROOT . '/' . $file)) {
+        if ($file !== FALSE && file_exists(DRUPAL_ROOT . '/' . $file)) {
           $files[$type][$name] = $file;
         }
       }
@@ -2182,7 +2182,7 @@ function drupal_anonymous_user() {
  *   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
  * @endcode
  *
- * @param $phase
+ * @param int $phase
  *   A constant telling which phase to bootstrap to. When you bootstrap to a
  *   particular phase, all earlier phases are run automatically. Possible
  *   values:
@@ -2195,11 +2195,11 @@ function drupal_anonymous_user() {
  *   - DRUPAL_BOOTSTRAP_LANGUAGE: Finds out the language of the page.
  *   - DRUPAL_BOOTSTRAP_FULL: Fully loads Drupal. Validates and fixes input
  *     data.
- * @param $new_phase
+ * @param boolean $new_phase
  *   A boolean, set to FALSE if calling drupal_bootstrap from inside a
  *   function called from drupal_bootstrap (recursion).
  *
- * @return
+ * @return int
  *   The most recently completed phase.
  */
 function drupal_bootstrap($phase = NULL, $new_phase = TRUE) {
@@ -2221,12 +2221,13 @@ function drupal_bootstrap($phase = NULL, $new_phase = TRUE) {
   // bootstrap state.
   static $stored_phase = -1;
 
-  // When not recursing, store the phase name so it's not forgotten while
-  // recursing.
-  if ($new_phase) {
-    $final_phase = $phase;
-  }
   if (isset($phase)) {
+    // When not recursing, store the phase name so it's not forgotten while
+    // recursing but take care of not going backwards.
+    if ($new_phase && $phase >= $stored_phase) {
+      $final_phase = $phase;
+    }
+
     // Call a phase if it has not been called before and is below the requested
     // phase.
     while ($phases && $phase > $stored_phase && $final_phase > $stored_phase) {
@@ -2514,7 +2515,7 @@ function _drupal_bootstrap_page_header() {
  * @see drupal_bootstrap()
  */
 function drupal_get_bootstrap_phase() {
-  return drupal_bootstrap();
+  return drupal_bootstrap(NULL, FALSE);
 }
 
 /**
@@ -3334,11 +3335,9 @@ function registry_update() {
  * @param $default_value
  *   Optional default value.
  * @param $reset
- *   TRUE to reset a specific named variable, or all variables if $name is NULL.
- *   Resetting every variable should only be used, for example, for running
- *   unit tests with a clean environment. Should be used only though via
- *   function drupal_static_reset() and the return value should not be used in
- *   this case.
+ *   TRUE to reset one or all variables(s). This parameter is only used
+ *   internally and should not be passed in; use drupal_static_reset() instead.
+ *   (This function's return value should not be used when TRUE is passed in.)
  *
  * @return
  *   Returns a variable by reference.
@@ -3383,6 +3382,8 @@ function &drupal_static($name, $default_value = NULL, $reset = FALSE) {
  *
  * @param $name
  *   Name of the static variable to reset. Omit to reset all variables.
+ *   Resetting all variables should only be used, for example, for running unit
+ *   tests with a clean environment.
  */
 function drupal_static_reset($name = NULL) {
   drupal_static($name, NULL, TRUE);
